@@ -13,33 +13,43 @@ OPTION:
 my %OPT;
 getopts('o:', \%OPT);
 
-if (@ARGV != 1) {
-    print STDERR $USAGE;
-    exit 1;
-}
-my ($PG_FILE_PATH) = @ARGV;
-my $PG_FILE_NAME = basename($PG_FILE_PATH);
-# my $DIR = dirname($PG_FILE_PATH);
+# if (@ARGV != 1) {
+#     print STDERR $USAGE;
+#     exit 1;
+# }
+# my ($PG_FILE_PATH) = @ARGV;
+
+!@ARGV && -t and die $USAGE;
+my @INPUT = <>;
+
 my $OUT_PREFIX = "";
-if ($PG_FILE_NAME =~ /^(.+).pg$/) {
-    $OUT_PREFIX = $1;
-}
-if ($OPT{o}) {
-    my $dir = $OPT{o};
-    $OUT_PREFIX = "$dir/$OUT_PREFIX";
-}
+# if ($OPT{o}) {
+#     $OUT_PREFIX = $OPT{o};
+# } else {
+#     die;
+# }
+
+# my $PG_FILE_NAME = basename($PG_FILE_PATH);
+# if ($PG_FILE_NAME =~ /^(.+).pg$/) {
+#     $OUT_PREFIX = $1;
+# }
+# if ($OPT{o}) {
+#     my $dir = $OPT{o};
+#     $OUT_PREFIX = "$dir/$OUT_PREFIX";
+# }
 
 my $NODES_FILE = "$OUT_PREFIX.pgx.nodes";
 my $EDGES_FILE = "$OUT_PREFIX.pgx.edges";
 my $JSON_FILE = "$OUT_PREFIX.pgx.json";
 
-while (my $line = <>) {
+for my $line (@INPUT) {
     chomp($line);
-    my @f = split(/\s+/, $line);
+    my @f = split(/\t/, $line);
     if ($f[1] eq "->" or $f[1] eq "--") {
-	
+        # edge
     } else {
-	print_nodes($line);
+        # node
+        print_node(@f);
     }
 }
 
@@ -47,19 +57,12 @@ while (my $line = <>) {
 ### Function ###################################################################
 ################################################################################
 
-sub print_nodes {
-    my ($line) = @_;
+sub print_node {
+    my @f = @_;
 
-    my @f = split(/\s+/, $line);
-
-    my $node_id = shift @f;
+    my ($node_id) = shift @f;
     print $node_id, "\n";
-
-    for my $field (@f) {
-	if ($field =~ /^:/) {
-	    
-	} elsif ($field =~ /^\S+:\S+$/) {
-	}
+    for my $f (@f) {
+        print $f, "\n";
     }
-    
 }
